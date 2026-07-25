@@ -5,16 +5,19 @@ class Extension:
     """Class for tracking an extension request."""
     counter = itertools.count()
 
-    def __init__(self, email, assignment, deadline, reason, date_submitted):
+    def __init__(self, email='N/A', assignment='N/A', deadline='N/A', reason='N/A', date_submitted='N/A'):
         self.email: str = email
         self.assignment: str = assignment
-        self.deadline: datetime = deadline
+        self.deadline: str = deadline
         self.reason: str = reason
-        self.date_submitted: datetime = date_submitted
+        self.date_submitted: str = date_submitted
         self.approved: bool = False
         self.id: int = next(Extension.counter)
 
     def __repr__(self):
         return f"{self.id} : {self.email} | {self.assignment} | {self.reason}"
 
-    
+    def __eq__(self, value):
+        if isinstance(value, Extension) and value.id == self.id:
+            return True
+        return False

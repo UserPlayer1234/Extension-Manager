@@ -14,9 +14,9 @@ def format_requests(responses) -> list[Extension]:
         extension = Extension(
             email=email,
             assignment=assignment,
-            deadline=datetime.fromisoformat(deadline),
+            deadline=datetime.fromisoformat(deadline).strftime("%m-%d-%Y %H:%m"),
             reason=reason,
-            date_submitted=datetime.fromisoformat(date_submitted),
+            date_submitted=datetime.fromisoformat(date_submitted).strftime("%m-%d-%Y %H:%m"),
         )
         extensions.append(extension)
 
