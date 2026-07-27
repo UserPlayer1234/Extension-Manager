@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -22,8 +23,22 @@ def obtain_creds() -> Credentials:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                CLIENT_SECRET, SCOPES)
+            app_creds = st.secrets.app_credentials
+
+            client_secret = {
+                app_creds.app_type: {
+                    "client_id": app_creds.client_id,
+                    "project_id": app_creds.project_id,
+                    "auth_uri": app_creds.auth_uri,
+                    "token_uri": app_creds.token_uri,
+                    "auth_provider_x509_cert_url": app_creds.auth_provider_x509_cert_url,
+                    "client_secret": app_creds.client_secret,
+                    "redirect_uris": app_creds.redirect_uris,
+                }
+            }
+
+            flow = InstalledAppFlow.from_client_config(
+                client_secret, SCOPES)
             creds = flow.run_local_server(port=0)
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
