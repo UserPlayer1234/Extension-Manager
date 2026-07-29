@@ -1,4 +1,4 @@
-from Extension import Extension
+from src.backend.Extension import Extension
 
 def print_extensions(extensions: list[Extension]):
     for extension in extensions:

@@ -1,5 +1,5 @@
 from datetime import datetime
-from Extension import Extension
+from src.backend.Extension import Extension
 
 def format_requests(responses) -> list[Extension]:
     extensions: list[Extension] = []

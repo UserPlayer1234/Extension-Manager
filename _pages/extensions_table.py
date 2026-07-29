@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-from Extension import Extension
+from src.backend.Extension import Extension
 
 extensions: dict[int, Extension] = st.session_state.extensions
 

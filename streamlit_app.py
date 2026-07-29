@@ -1,10 +1,10 @@
 import streamlit as st
 
-import authorize
-import google_forms
-import format
+import src.backend.authorize as authorize
+import src.backend.google_forms as google_forms
+import src.backend.format as format
 
-from Extension import Extension
+from src.backend.Extension import Extension
 
 # Define login state variables
 if "logged_in" not in st.session_state:
@@ -20,8 +20,8 @@ def login():
         st.rerun()
 
 login_pg = st.Page(login, title="Login Page")
-table_pg = st.Page("extensions_table.py", title="Extensions Table")
-approver_pg = st.Page("extensions_approver.py", title="Extensions Approver")
+table_pg = st.Page("_pages/extensions_table.py", title="Extensions Table")
+approver_pg = st.Page("_pages/extensions_approver.py", title="Extensions Approver")
 
 if st.session_state.logged_in:
     form = google_forms.Form(creds=st.session_state.creds)

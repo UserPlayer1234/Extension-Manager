@@ -1,5 +1,5 @@
 import streamlit as st
-from Extension import Extension
+from src.backend.Extension import Extension
 
 current_extension: Extension = st.session_state.current_extension
 extension_placeholder: Extension = st.session_state.extension_placeholder
