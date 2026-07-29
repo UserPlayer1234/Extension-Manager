@@ -1,4 +1,5 @@
 import streamlit as st
+import src.backend.database as db
 from src.backend.Extension import Extension
 
 current_extension: Extension = st.session_state.current_extension
@@ -7,10 +8,16 @@ extensions_iter = st.session_state.extensions_iter
 
 def approve_extension():
     current_extension.approved = True
+    database = db.DatabaseConnection()
+    database.update_approval(current_extension, current_extension.approved)
+    database.close()
     st.session_state.current_extension = next(extensions_iter, extension_placeholder)
 
 def deny_extension():
     current_extension.approved = False
+    database = db.DatabaseConnection()
+    database.update_approval(current_extension, current_extension.approved)
+    database.close()
     st.session_state.current_extension = next(extensions_iter, extension_placeholder)
 
 def approver():

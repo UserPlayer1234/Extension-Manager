@@ -1,4 +1,3 @@
-from datetime import datetime
 import itertools
 
 class Extension:
@@ -13,6 +12,7 @@ class Extension:
         self.date_submitted: str = date_submitted
         self.approved: bool = False
         self.id: int = next(Extension.counter) if email != 'N/A' else -1
+        print(f"Created extension with id: {self.id}")
 
     def __repr__(self):
         return f"{self.id} : {self.approved}"
