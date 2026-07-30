@@ -17,6 +17,7 @@ if "creds" not in st.session_state:
 def login():
     if st.button("Login with Google"):
         creds = authorize.obtain_creds()
+        st.session_state.creds = creds
         st.session_state.logged_in = True
 
         # Retrieve extension requests
@@ -51,12 +52,13 @@ def login():
 
 # Define pages
 login_pg = st.Page(login, title="Login Page")
-table_pg = st.Page("_pages/extensions_table.py", title="Extensions Table")
-approver_pg = st.Page("_pages/extensions_approver.py", title="Extensions Approver")
+form_pg = st.Page("_pages/extensions_form.py", title="Extension Form")
+table_pg = st.Page("_pages/extensions_table.py", title="Extension Table")
+approver_pg = st.Page("_pages/extensions_approver.py", title="Extension Approver")
 
 # Display pages based on logged in state
 if st.session_state.logged_in:
-    pg = st.navigation([table_pg, approver_pg])
+    pg = st.navigation([form_pg, table_pg, approver_pg])
 else:
     pg = st.navigation([login_pg])
 

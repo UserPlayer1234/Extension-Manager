@@ -4,7 +4,7 @@ from googleapiclient import discovery
 class Form:
     def __init__(self, creds: Credentials):
         self.service = discovery.build('forms', 'v1', credentials=creds)
-
+        self.formId = None
 
     def create_form(self, form_info: dict[str, str]):
         form = {

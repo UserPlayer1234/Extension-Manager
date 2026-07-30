@@ -17,7 +17,7 @@ def retrieve_data() -> dict:
     return data
 
 def table():        
-    st.header("Extensions Table")
+    st.header("Extension Table")
 
     data = retrieve_data()
 
