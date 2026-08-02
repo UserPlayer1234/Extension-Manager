@@ -12,7 +12,7 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if "creds" not in st.session_state:
-        st.session_state.creds = None
+    st.session_state.creds = None
 
 def login():
     if st.button("Login with Google"):
@@ -22,7 +22,7 @@ def login():
 
         # Retrieve extension requests
         form = google_forms.Form(creds=creds)
-        form.formId = st.secrets.form_id
+        form.form_id = st.secrets.form_id
         responses = form.retrieve_form()
         extensions = format.format_requests(responses=responses)
 

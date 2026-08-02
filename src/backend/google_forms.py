@@ -4,7 +4,8 @@ from googleapiclient import discovery
 class Form:
     def __init__(self, creds: Credentials):
         self.service = discovery.build('forms', 'v1', credentials=creds)
-        self.formId = None
+        self.form_id = None
+        self.form_url = None
 
     def create_form(self, form_info: dict[str, str]):
         form = {
@@ -15,7 +16,8 @@ class Form:
         }
 
         create_result = self.service.forms().create(body=form).execute()
-        self.formId = create_result["formId"]
+        self.form_id = create_result["formId"]
+        self.form_url = create_result["responderUri"]
 
         update = {
             "includeFormInResponse": True,
@@ -99,5 +101,5 @@ class Form:
         return form_result
 
     def retrieve_form(self):
-        responses = self.service.forms().responses().list(formId=self.formId).execute()
+        responses = self.service.forms().responses().list(formId=self.form_id).execute()
         return responses

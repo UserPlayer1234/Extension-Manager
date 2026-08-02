@@ -2,6 +2,13 @@ import streamlit as st
 import src.backend.database as db
 from src.backend.google_forms import Form
 
+# Define form state variables
+if "form_id" not in st.session_state:
+    st.session_state.form_id = st.secrets.form_id
+
+if "form_url" not in st.session_state:
+    st.session_state.form_url = "N/A"
+
 def form():
     st.header("Extension Form")
 
@@ -12,7 +19,8 @@ def form():
         st.multiselect('Assignments', key="assignments", options=[], placeholder='Add assignments', accept_new_options=True)
         st.form_submit_button('Create Google Form', on_click=create_form)
 
-    st.text_area('Form ID', st.secrets.form_id, height="content", disabled=True)
+    st.text_area('Form ID', st.session_state.form_id, height="content", disabled=True)
+    st.text_area('Form URL', st.session_state.form_url, height="content", disabled=True)
 
 def create_form():
     form_data = {
@@ -22,8 +30,9 @@ def create_form():
         "assignments": st.session_state.assignments,
         }
     
-    print(form_data)
-    #form = Form(st.session_state.creds)
-    
+    form = Form(st.session_state.creds)
+    form.create_form(form_data)
+    st.session_state.form_id = form.form_id
+    st.session_state.form_url = form.form_url
 
 form()
