@@ -2,13 +2,6 @@ import streamlit as st
 import src.backend.database as db
 from src.backend.google_forms import Form
 
-# Define form state variables
-if "form_id" not in st.session_state:
-    st.session_state.form_id = st.secrets.form_id
-
-if "form_url" not in st.session_state:
-    st.session_state.form_url = "N/A"
-
 def form():
     st.header("Extension Form")
 
@@ -34,5 +27,9 @@ def create_form():
     form.create_form(form_data)
     st.session_state.form_id = form.form_id
     st.session_state.form_url = form.form_url
+
+    database = db.DatabaseConnection(st.secrets.instructor_id)
+    database.insert_instructor(form.form_id, form.form_url)
+    database.close()
 
 form()

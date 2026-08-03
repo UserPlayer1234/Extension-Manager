@@ -15,10 +15,13 @@ if "creds" not in st.session_state:
     st.session_state.creds = None
 
 def login():
-    if st.button("Login with Google"):
-        creds = authorize.obtain_creds()
-        st.session_state.creds = creds
+    if st.button("Login with Google", disabled=st.session_state.logged_in):
         st.session_state.logged_in = True
+        flow = authorize.construct_flow()
+        #auth_url = flow.authorization_url()[0]
+        #auth_url_popup(auth_url=auth_url)
+        creds = authorize.obtain_creds(flow=flow)
+        st.session_state.creds = creds
 
         # Retrieve extension requests
         form = google_forms.Form(creds=creds)
@@ -27,12 +30,21 @@ def login():
         extensions = format.format_requests(responses=responses)
 
         # Connect to database and store/update extensions
-        database = db.DatabaseConnection()
+        database = db.DatabaseConnection(st.secrets.instructor_id)
         extensions_dict = {extension.id: extension for extension in extensions}
+
         for extension in extensions:
             database.insert_ext(extension)
-        for id, approval in database.get_all_exts():
+        for id, _, approval in database.get_all_exts():
             extensions_dict[id].approved = approval
+
+        settings = database.get_instructor()
+        # Define form state variables
+        if "form_id" not in st.session_state:
+            st.session_state.form_id = settings[1] if settings else "N/A"
+        if "form_url" not in st.session_state:
+            st.session_state.form_url = settings[2] if settings else "N/A"
+
         database.close()
 
         # Defining extension state variables
@@ -49,6 +61,11 @@ def login():
             st.session_state.current_extension = next(st.session_state.extensions_iter, st.session_state.extension_placeholder)
 
         st.rerun()
+
+@st.dialog('Logging into Google...', dismissible=False)
+def auth_url_popup(auth_url):
+    st.write('Please follow the link below to log into Google.')
+    st.write(auth_url)
 
 # Define pages
 login_pg = st.Page(login, title="Login Page")

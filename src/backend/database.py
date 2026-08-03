@@ -2,18 +2,36 @@ import sqlite3
 from src.backend.Extension import Extension
 
 class DatabaseConnection:
-    def __init__(self):
+    def __init__(self, instructor):
         self.connection = sqlite3.connect('extensions.db')
         self.cursor = self.connection.cursor()
+        self.instructor = instructor
 
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS extensions (
-                    id integer primary key,
-                    approved integer
-                    )""")
+                            id integer primary key,
+                            instructor integer,
+                            approved integer
+                            )""")
+
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS instructors (
+                            id text primary key,
+                            form_id text,
+                            form_url text
+                            )""")
+
+    def insert_instructor(self, form_id, form_url):
+        with self.connection:
+            self.cursor.execute("""INSERT OR IGNORE INTO instructors VALUES (:id, :form_id, :form_url)""", 
+            {'id': self.instructor, 'form_id': form_id, 'form_url': form_url})
+
+    def get_instructor(self):
+        self.cursor.execute("SELECT * FROM instructors WHERE id=:id", {'id': self.instructor})
+        return self.cursor.fetchone()
 
     def insert_ext(self, ext: Extension):
         with self.connection:
-            self.cursor.execute("INSERT OR IGNORE INTO extensions VALUES (:id, :approved)", {'id': ext.id, 'approved': int(ext.approved)})
+            self.cursor.execute("""INSERT OR IGNORE INTO extensions VALUES (:id, :instructor, :approved)""", 
+            {'id': ext.id, 'instructor': self.instructor, 'approved': int(ext.approved)})
 
     def get_exts_by_approval(self, approval: bool):
         self.cursor.execute("SELECT * FROM extensions WHERE approved=:approved", {'approved': int(approval)})
@@ -35,5 +53,5 @@ class DatabaseConnection:
                     {'id': ext.id, 'approved': ext.approved})
 
     def close(self):
-        print(self.get_all_exts())
+        #print(self.get_all_exts())
         self.connection.close()

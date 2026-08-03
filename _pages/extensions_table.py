@@ -38,7 +38,7 @@ def update_extensions():
     toggled = {row: cols["Approved?"] for row, cols in changes.items() if "Approved?" in cols}
 
     # Update Extensions
-    database = db.DatabaseConnection()
+    database = db.DatabaseConnection(st.secrets.instructor_id)
     for row, new_val in toggled.items():
         extension = next((extension for extension in extensions.values() if extension.id == row), None)
         if extension:
