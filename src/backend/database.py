@@ -10,7 +10,8 @@ class DatabaseConnection:
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS extensions (
                             id integer primary key,
                             instructor integer,
-                            approved integer
+                            approved integer,
+                            note text
                             )""")
 
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS instructors (
@@ -30,8 +31,8 @@ class DatabaseConnection:
 
     def insert_ext(self, ext: Extension):
         with self.connection:
-            self.cursor.execute("""INSERT OR IGNORE INTO extensions VALUES (:id, :instructor, :approved)""", 
-            {'id': ext.id, 'instructor': self.instructor, 'approved': int(ext.approved)})
+            self.cursor.execute("""INSERT OR IGNORE INTO extensions VALUES (:id, :instructor, :approved, :note)""", 
+            {'id': ext.id, 'instructor': self.instructor, 'approved': int(ext.approved), 'note': ext.note})
 
     def get_exts_by_approval(self, approval: bool):
         self.cursor.execute("SELECT * FROM extensions WHERE approved=:approved", {'approved': int(approval)})
@@ -41,17 +42,15 @@ class DatabaseConnection:
         self.cursor.execute("SELECT * FROM extensions")
         return self.cursor.fetchall()
 
-    def update_approval(self, ext: Extension, approval: bool):
+    def update_approval(self, ext: Extension, approval: bool, note: str = ""):
         with self.connection:
-            self.cursor.execute("""UPDATE extensions SET approved = :approved
-                        WHERE id = :id""",
-                    {'id': ext.id, 'approved': approval})
+            self.cursor.execute("""UPDATE extensions SET approved = :approved, note = :note WHERE id = :id""",
+                    {'id': ext.id, 'approved': approval, 'note': note})
 
     def remove_ext(self, ext: Extension):
         with self.connection:
-            self.cursor.execute("DELETE from extensions WHERE id = :id AND approved = :approved",
-                    {'id': ext.id, 'approved': ext.approved})
+            self.cursor.execute("DELETE from extensions WHERE id = :id", {'id': ext.id})
 
     def close(self):
-        #print(self.get_all_exts())
+        print(self.get_all_exts())
         self.connection.close()

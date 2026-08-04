@@ -5,31 +5,16 @@ from src.backend.Extension import Extension
 
 extensions: dict[int, Extension] = st.session_state.extensions
 
-def retrieve_data() -> dict:
-    data = {
-        "Approved?": [ext.approved for ext in extensions.values()],
-        "Email": [ext.email for ext in extensions.values()],
-        "Assignment": [ext.assignment for ext in extensions.values()],
-        "Submitted On": [ext.date_submitted for ext in extensions.values()],
-        "New Deadline": [ext.deadline for ext in extensions.values()],
-        "Reason": [ext.reason for ext in extensions.values()],
-    }
-    return data
+@st.cache_data
+def organize_extensions_by_student() -> dict[str, list[int]]:
+    exts_by_student: dict[str, list[int]] = {}
 
-def table():        
-    st.header("Extension Table")
+    for id, ext in extensions.items():
+        if not exts_by_student.get(ext.email):
+            exts_by_student[ext.email] = []
+        exts_by_student[ext.email].append(id)
 
-    data = retrieve_data()
-
-    data = pd.DataFrame(data, index=list(extensions.keys()))
-
-    disabled_cols = ["_index", "Email", "Assignment", "Submitted On", "New Deadline", "Reason"]
-
-    column_config = {
-        "Approved?": st.column_config.CheckboxColumn("Approved?",pinned=True)
-    }
-
-    edited_data = st.data_editor(data, key="editor", width='stretch', disabled=disabled_cols, column_config=column_config)
+    return exts_by_student
 
 def update_extensions():
     changes = st.session_state["editor"]["edited_rows"]
@@ -46,8 +31,55 @@ def update_extensions():
             database.update_approval(extension, extension.approved)
     database.close()
 
-def update_button():
-    update = st.button('Save Changes', on_click=update_extensions)
+def table():        
+    st.header("Extension Table")
 
+    data = {
+        "Approved?": [ext.approved for ext in extensions.values()],
+        "Email": [ext.email for ext in extensions.values()],
+        "Assignment": [ext.assignment for ext in extensions.values()],
+        "Submitted On": [ext.date_submitted for ext in extensions.values()],
+        "New Deadline": [ext.deadline for ext in extensions.values()],
+        "Reason": [ext.reason for ext in extensions.values()],
+        }
+
+    data = pd.DataFrame(data, index=list(extensions.keys()))
+
+    disabled_cols = ["_index", "Email", "Assignment", "Submitted On", "New Deadline", "Reason"]
+
+    column_config = {
+        "Approved?": st.column_config.CheckboxColumn("Approved?",pinned=True)
+    }
+
+    st.data_editor(data, key="editor", width='stretch', disabled=disabled_cols, column_config=column_config)
+    st.button('Save Changes', on_click=update_extensions)
+
+def history():
+    exts_by_student = organize_extensions_by_student()
+
+    students = exts_by_student.keys()
+    option = st.selectbox('Student Email', students)
+
+    ids = exts_by_student[option]
+
+    data = {
+        "Approved?": [extensions[id].approved for id in ids],
+        "Assignment": [extensions[id].assignment for id in ids],
+        "Submitted On": [extensions[id].date_submitted for id in ids],
+        "New Deadline": [extensions[id].deadline for id in ids],
+        "Reason": [extensions[id].reason for id in ids],
+    }
+
+    data = pd.DataFrame(data, index=ids)
+    
+    disabled_cols = ["_index", "Approved?", "Assignment", "Submitted On", "New Deadline", "Reason"]
+
+    column_config = {
+        "Approved?": st.column_config.CheckboxColumn("Approved?",pinned=True)
+    }
+
+    st.data_editor(data, key="history", width='stretch', disabled=disabled_cols, column_config=column_config)
+
+    
 table()
-update_button()
+history()

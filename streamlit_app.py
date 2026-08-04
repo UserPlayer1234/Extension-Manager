@@ -35,9 +35,14 @@ def login():
 
         for extension in extensions:
             database.insert_ext(extension)
-        for id, _, approval in database.get_all_exts():
-            extensions_dict[id].approved = approval
 
+        print(database.get_all_exts())
+        print(extensions_dict)
+        for id, _, approval, note in database.get_all_exts():
+            extensions_dict[id].approved = approval
+            extensions_dict[id].note = note
+
+        #database.insert_instructor(st.secrets.form_id, st.secrets.form_url)
         settings = database.get_instructor()
         # Define form state variables
         if "form_id" not in st.session_state:
